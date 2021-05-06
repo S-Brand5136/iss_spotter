@@ -1,5 +1,27 @@
 const request = require("request");
 
+const nextISSTimesForMyLocation = (callback) => {
+  fetchMyIP((error, ip) => {
+    if (error) {
+      return callback(error, null);
+    }
+
+    return fetchCoordsByIP(ip, (error, coords) => {
+      if (error) {
+        return callback(error, null);
+      }
+
+      return fetchISSFlyOverTimes(coords, (error, times) => {
+        if (error) {
+          return callback(error, null);
+        }
+
+        return callback(null, times);
+      });
+    });
+  });
+};
+
 const fetchMyIP = (callback) => {
   request(`https://api.ipify.org?format=json`, (error, response, body) => {
     if (error) {
@@ -54,4 +76,4 @@ const fetchISSFlyOverTimes = function ({ latitude, longitude }, callback) {
   );
 };
 
-module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
+module.exports = { nextISSTimesForMyLocation };
